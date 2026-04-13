@@ -29,19 +29,16 @@ def crear_modelo_simple(n_features):
 
 def crear_modelo_complejo(n_features):
     """Red neuronal compleja para demostrar overfitting.
-    Arquitectura: Input(n) → 256 → 256 → 128 → 128 → 64 → 64 → 32 → 1
+    Arquitectura: Input(n) → 64 → 64 → 32 → 32 → 1
     Sin regularización para facilitar la memorización.
 
     n_features: Número de features de entrada """
     modelo = keras.Sequential([
-        layers.Dense(256, activation='relu', input_shape=(n_features,),
+        layers.Dense(64, activation='relu', input_shape=(n_features,),
                      name='capa_oculta_1'),
-        layers.Dense(256, activation='relu', name='capa_oculta_2'),
-        layers.Dense(128, activation='relu', name='capa_oculta_3'),
-        layers.Dense(128, activation='relu', name='capa_oculta_4'),
-        layers.Dense(64, activation='relu', name='capa_oculta_5'),
-        layers.Dense(64, activation='relu', name='capa_oculta_6'),
-        layers.Dense(32, activation='relu', name='capa_oculta_7'),
+        layers.Dense(64, activation='relu', name='capa_oculta_2'),
+        layers.Dense(32, activation='relu', name='capa_oculta_3'),
+        layers.Dense(32, activation='relu', name='capa_oculta_4'),
         layers.Dense(1, name='salida')
     ], name='modelo_complejo')
 
@@ -130,8 +127,7 @@ def entrenar_modelo_optimo(X_train, y_train, X_test, y_test):
 def entrenar_modelo_sobreentrenado(X_train, y_train, X_test, y_test):
     """MODELO SOBREENTRENADO (Overfitting):
      Arquitectura COMPLEJA (7 capas ocultas, ~100k parámetros)
-     300 épocas sin Early Stopping
-     Batch pequeño (16) para facilitar memorización
+     100 épocas sin Early Stopping
      Sin regularización (sin Dropout, sin L2)
 
     Resultado esperado:
@@ -140,7 +136,7 @@ def entrenar_modelo_sobreentrenado(X_train, y_train, X_test, y_test):
          Diagnóstico: ALTA VARIANZA """
     print("\n" + "=" * 60)
     print("  🟡 MODELO SOBREENTRENADO (Overfitting)")
-    print("     Épocas: 300 | Arquitectura: Compleja | Sin regularización")
+    print("     Épocas: 100 | Arquitectura: Compleja | Sin regularización")
     print("=" * 60)
 
     n_features = X_train.shape[1]
@@ -148,12 +144,13 @@ def entrenar_modelo_sobreentrenado(X_train, y_train, X_test, y_test):
 
     historia = modelo.fit(
         X_train, y_train,
-        epochs=300,             # DEMASIADAS épocas
-        batch_size=16,          # Batch pequeño → facilita memorización
+        epochs=50,              # Muchas épocas + modelo complejo = memoriza
+        batch_size=64,
         validation_data=(X_test, y_test),
-        verbose=0               # Silencioso porque son muchas épocas
+        verbose=1
     )
 
     print(f"  Entrenamiento completado: {len(historia.history['loss'])} épocas")
 
     return modelo, historia
+
